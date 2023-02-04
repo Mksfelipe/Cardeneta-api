@@ -15,7 +15,7 @@ public interface ClientRepository extends JpaRepository<Client, Long>{
 	
 	public Optional<Client> findByCpf(String cpf);
 
-	@Query(value="SELECT c FROM Client c where c.firstName like UPPER(?1) OR c.lastName like UPPER(?2)")
+	@Query(value="SELECT c FROM Client c WHERE c.firstName LIKE CONCAT('%', ?1, '%') OR c.lastName LIKE CONCAT('%', ?2, '%')")
 	public Page<Client> findByIgnoreCaseFistNameAndLastName(String firstName, String lastName, Pageable pageable);
 	
 }

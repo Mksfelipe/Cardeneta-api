@@ -58,16 +58,25 @@ public class PurchaseService {
 	@Transactional
 	public void scheduledPayment(Account account, BigDecimal amountReceived) {
 		
+		if (amountReceived.compareTo(account.getAmount()) == -1) {
+			throw new NegocioException("Valor deve ser maior que o valor total da conta");
+		}
+		
 		Payment payment = new Payment();
 		payment.setAccount(account);
-		paymentRepository.save(payment);
 		
 		payment.setAmount(account.getAmount());
 		payment.setAmountReceived(amountReceived);
 		payment.setThing(amountReceived.subtract(account.getAmount()));
 		
-		account.getPurchaselist().stream().forEachOrdered(purchased -> purchased.setStatus(PurchaseStatus.PAID));
-		account.getPurchaselist().stream().forEachOrdered(purchased -> purchased.setPayment(payment));
+		paymentRepository.save(payment);
+		
+		for (Purchase purchased : account.getPurchaselist()) {
+			purchased.setStatus(PurchaseStatus.PAID);
+			purchased.setPayment(payment);
+		}
+		
+		account.setLastDataPayment(LocalDateTime.now());
 		account.setAmount(BigDecimal.ZERO);
 	
 		

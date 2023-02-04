@@ -12,7 +12,7 @@ import com.br.domain.model.Purchase;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
-	@Query("select p from Purchase p inner join p.account a where a = :account")
+	@Query("select p from Purchase p inner join p.account a where a = :account AND p.status = 'UNPAID'")
 	public Page<Purchase> findByPurcheadForAccount(@Param("account") Account account, Pageable pageable);
 
 }
